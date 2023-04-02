@@ -40,20 +40,22 @@ exports.signUp = async (req, res) => {
             return res.status(409).json({ message: "This email is already in use." });
         }
         // 3- Check if the password and the confirmpassword are the same
-        const password = await User.findOne({ password: req.body.password });
-        const confirmpassword = await User.findOne({ password: req.body.confirmP0assword });
+        const password = req.body.password;
+        const confirmpassword = req.body.passwordConfirm;
 
         // But passwords are hashed my bcrypt so we compare the hashed passwords
         // This is automated in the user Model
+        console.log(password);
+        console.log(confirmpassword);
 
         if (password !== confirmpassword) {
-            return res.status(400).jon({ message: "Passowrd don't match." });
+            return res.status(400).json({ message: "Passowrd don't match." });
         }
 
         //4- If everything in ok ---> Create a new user
 
         const newUser = await User.create({
-            fullName: req.bosy.fullName,
+            fullName: req.body.fullName,
             email: req.body, email,
             password: req.body.password
         })
@@ -105,8 +107,8 @@ exports.forgotPassword = async (req, res) => {
 
     //2- Check the reset token to be sent via email
 
-    const resetToken = user.generatedPasswordResetToken();
-    await User.save({ validateBeforeSave: false })
+    const resetToken = user.generatePasswordResetToken();
+    await user.save({ validateBeforeSave: false })
 
 
     //3- Send the token via email
