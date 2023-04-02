@@ -1,6 +1,8 @@
 const validator = require("validator");
 const User = require("../models/userModels");
 const jwt = require("jsonwebtoken");
+const sendMail = require('../utils/sendMail');
+const crypto = require('crypto');
 
 
 // To create a jwt token we should split the process into 2 parts
@@ -80,7 +82,7 @@ exports.logIn = async (req, res) => {
 
         //2: Check if the enterd password is matching with the hashed stored password
 
-        if (!(await user.checkPassword(req.password, user.password))) {
+        if (!(await user.checkPassword(req.body.password, user.password))) {
             return res.status(401).json({ message: "Your email or password is incorrect." });
         }
 
@@ -90,7 +92,7 @@ exports.logIn = async (req, res) => {
         createSendToken(user, 200, res, msg);
 
     } catch (error) {
-        console.log(err);
+        console.log(error);
     }
 }
 
@@ -120,17 +122,19 @@ exports.forgotPassword = async (req, res) => {
     const msg = `Forget your password? Reset it by visiting the following link: ${url}`;
     try {
         await sendMail({
-            email: user.email,
+            from: "abiakaromar18@outlook.com",
+            to: user.email,
             subject: "Your Password reset token: (Valid for 10 min)",
-            message: msg
+            text: msg
         });
 
         res.status(200).json({ status: "success", message: "The email you sent is successful." })
 
     } catch (err) {
+        console.log(err);
         user.passwordResetToken = undefined;
         user.passwordResetExpires = undefined;
-        await User.save({ validateBeforeSave: false });
+        await user.save({ validateBeforeSave: false });
 
         res.status(500).json({
             message: "An error occured while sending the email, please try again in a moment.",
