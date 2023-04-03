@@ -19,8 +19,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         trim: true,
         minLength: 8,
-        maxLength: 30,
+        //maxLength: 30,
         required: [true, "Please enter your Password"],
+    },
+    userPoints: {
+        type: Number,
+        default: 0
     },
     passwordChangedAt: Date,
     passwordResetToken: String,

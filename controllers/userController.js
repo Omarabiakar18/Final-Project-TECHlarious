@@ -3,14 +3,40 @@ const User = require("../models/userModels");
 const jwt = require("jsonwebtoken");
 const sendMail = require('../utils/sendMail');
 const crypto = require('crypto');
+const metadata = require('../QNA');
+
+exports.getQNA = (req, res) => { // This function sends the questions to the user --React will dispaly the questions and answers
+    return res.status(200).json(metadata);
+}
+
+exports.savePoints = async (req, res) => {
+    try {
+
+        const user = await User.findOne({ email: req.body.email });
+        if (!user) {
+            return res.status(404).json({ message: "This email doesn't exist" });
+        }
+
+        const point = req.body.userPoints;
+        if (!point) {
+            return res.status(404).json({ message: "Give the points" });
+        }
+
+        user.userPoints = point;
+        await user.save();
+        return res.status(200).json({ message: "Points are saved!!" });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error" })
+    }
+}
 
 
 // To create a jwt token we should split the process into 2 parts
 // 1: Create a function taht will sign a token
 // To sign a token, we should provide 3 main factors:
-// Factor 1: A unique field from the user: we choose always the id
-// Factor 2: JWT_SECRECT
-// Factor3: JWT_EXPIRES_IN
+// Factor 1: A unique field from the user: we choose always the id Factor 2: JWT_SECRECT Factor3: JWT_EXPIRES_IN
 
 const signToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN, });
@@ -90,6 +116,7 @@ exports.logIn = async (req, res) => {
 
         let msg = "Login Successfull."
         createSendToken(user, 200, res, msg);
+
 
     } catch (error) {
         console.log(error);
@@ -207,10 +234,10 @@ exports.protect = async (req, res, next) => {
             res.status(401).json("Your password has been changed!! Please log in again");
         }
 
-
         // 5: If everything is ok: ADD the user to all the requests (req.user = currentUser)
         req.user = currentUser;
         next();
+
     } catch (error) {
         console.log(error);
     }
