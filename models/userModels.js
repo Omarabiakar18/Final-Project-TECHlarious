@@ -26,6 +26,14 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    userFeedback: {
+        type: String,
+        default: " "
+    },
+    userBadge: {
+        type: String,
+        default: "You don't have any badges!!"
+    },
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
