@@ -1,20 +1,8 @@
-const jwt = require("jsonwebtoken");
+const Promo = require("../models/promocodeModels");
+const User = require("../models/userModels");
 
-const signToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_REDEEM_SECRET, { expiresIn: process.env.JWT_REDEEM_EXPIRES_IN, });
-};
 
-// 2- Create a function that will send the redeem code to the user
-const createRedeem = (user, statusCode, res, msg) => {
-    const redeemCode = signToken(user._id);
-
-    res.status(statusCode).json({
-        status: "Success",
-        token,
-        data: { message: msg, user },
-    });
-};
-exports.redeemPoints = async (req, res) => {
+exports.getPromo = async (req, res) => {
     try {
         // 1- Make sure the user is valid
         const user = await User.findOne({ email: req.body.email });
@@ -35,15 +23,21 @@ exports.redeemPoints = async (req, res) => {
             return res.status(404).json({ message: "You dont have enough points to redeem this item." });
         }
 
-        // 3- Make sure available promo code is not expired
-        // let msg = ""
-        // createRedeem(user, 201, res, msg)
 
-        // 4- If everything is ok .... Send the code
+        // 3- If everything is ok --> Buy the code --> Display the code
         const newPoint = (point - price);
         user.userPoints = newPoint;
         await user.save();
-        return res.status(200).json({ message: "Item redeemed." });
+
+        const promo = await Promo.create({
+            value: 50
+        })
+
+        const code = `${promo.code}`;
+
+        //Display the promo code
+
+        return res.status(200).json({ message: `Item redeemed. Your promo code is: ${code}` });
 
     } catch (error) {
         console.error(error);

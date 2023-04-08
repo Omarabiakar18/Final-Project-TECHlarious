@@ -1,7 +1,7 @@
 const User = require("../models/userModels");
 const sendMail = require('../utils/sendMail');
 
-exports.feedback = async (req, res) => {
+exports.request = async (req, res) => {
     try {
 
         const user = await User.findOne({ email: req.body.email });
@@ -9,9 +9,9 @@ exports.feedback = async (req, res) => {
             return res.status(404).json({ message: "This user doesn't exist" });
         }
 
-        const feedbackString = req.body.feedback;
-        if (!feedbackString) {
-            return res.status(404).json({ message: "Enter your feedback." });
+        const requestString = req.body.request;
+        if (!requestString) {
+            return res.status(404).json({ message: "Enter your Requested Celebrity." });
         }
 
 
@@ -19,20 +19,20 @@ exports.feedback = async (req, res) => {
 
         //3.1- Ceate this URL
 
-        const userFeedback = user.userFeedback;
+        const userRequest = user.userRequest;//To test use: req.body.request
 
-        const feedback = `${userFeedback}`;
+        const request = `${userRequest}`;
         const email = `${user.email}`;
-        const msg = `Feedback from: ${email} is "${feedback}"`;
+        const msg = `Request from: ${email} is "${request}"`;
         try {
             await sendMail({
                 from: "abiakaromar18@outlook.com",
                 to: "abiakaromar18@outlook.com",
-                subject: "Feedback from website!!",
+                subject: "Request from website!!",
                 text: msg
             });
 
-            res.status(200).json({ status: "success", message: "The email you sent is successful. Your feedback is recorded, Thank you for making this website better!!" })
+            res.status(200).json({ status: "success", message: "The email you sent is successful. Your Request is recorded!!" })
 
         } catch (err) {
             console.log(err);

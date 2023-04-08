@@ -78,7 +78,7 @@ exports.logIn = async (req, res) => {
         const user = await User.findOne({ email: req.body.email });
 
         if (!user) {
-            return res.status(404).json({ message: "This email doesn't exist" });
+            return res.status(404).json({ message: "This email doesn't exist!! SignUp to Continue!!" });
         }
 
         //2: Check if the enterd password is matching with the hashed stored password
