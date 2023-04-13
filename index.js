@@ -1,6 +1,6 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const DB = require('./database').connectDB;
+const DB = require("./database").connectDB;
 const cors = require("cors");
 
 //Routes
@@ -10,11 +10,10 @@ const userRouter = require("./routes/userRoutes");
 // Connect to our DB
 DB();
 
+app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
-app.use(cors());
-
 
 app.use(express.json());
 
@@ -23,7 +22,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`Listening on port: ${PORT} or http://127.0.0.1:${PORT}`);
+  console.log(`Listening on port: ${PORT} or http://127.0.0.1:${PORT}`);
 });
 
 // app.get("/", (request, response) => {
